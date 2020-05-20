@@ -29,10 +29,27 @@ defmodule Optimus do
   def atkin(3), do: [2, 3]
 
   def atkin(m) do
+    m
+    |> atkin_sieve
+    |> sieve_to_list
+  end
+
+  def sieve_to_list(sieve) do
+    Enum.reduce(2..(:array.size(sieve) - 1), [], fn i, acc ->
+      val = :array.get(i, sieve)
+
+      if val do
+        [i | acc]
+      else
+        acc
+      end
+    end)
+    |> Enum.reverse()
+  end
+
+  def atkin_sieve(m) do
     limit = trunc(:math.sqrt(m)) + 1
     sieve = :array.new(m + 1, {:default, false})
-
-    inspect(limit)
 
     sieve =
       Enum.reduce(1..limit, sieve, fn x, sieve ->
@@ -71,27 +88,15 @@ defmodule Optimus do
     sieve = :array.set(2, true, sieve)
     sieve = :array.set(3, true, sieve)
 
-    sieve =
-      Enum.reduce(5..limit, sieve, fn i, sieve ->
-        current = :array.get(i, sieve)
+    Enum.reduce(5..limit, sieve, fn i, sieve ->
+      current = :array.get(i, sieve)
 
-        if current do
-          reset_quadratics(sieve, m, i * i)
-        else
-          sieve
-        end
-      end)
-
-    Enum.reduce(2..(m - 1), [], fn i, acc ->
-      val = :array.get(i, sieve)
-
-      if val do
-        [i | acc]
+      if current do
+        reset_quadratics(sieve, m, i * i)
       else
-        acc
+        sieve
       end
     end)
-    |> Enum.reverse()
   end
 
   defp toggle_prime(array, index) do
@@ -106,6 +111,10 @@ defmodule Optimus do
   defp reset_quadratics(array, n, i) do
     :array.set(i, false, array)
     |> reset_quadratics(n, i * i)
+  end
+
+  def prime?(n, primes_sieve) do
+    :array.get(n, primes_sieve) == true
   end
 
   @doc """
