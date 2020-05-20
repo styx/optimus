@@ -148,13 +148,16 @@ defmodule Optimus do
       |> div(2)
       |> Kernel.+(1)
 
-    primes = Enum.take_while(big_list_of_primes, limit)
+    primes = Enum.take_while(big_list_of_primes, fn prime -> prime <= limit end)
     do_factorize(n, n, primes, %{})
   end
 
+  @spec do_factorize(integer, integer, [any()] | [], %{integer => integer}) :: %{
+          integer => integer
+        }
   defp do_factorize(1, _n, _primes, factors), do: factors
 
-  defp do_factorize(_current_n, n, [], %{}), do: %{n => 1}
+  defp do_factorize(_current_n, n, [], factors) when map_size(factors) == 0, do: %{n => 1}
 
   defp do_factorize(current_n, _n, [], factors) do
     {_, new_factors} =
